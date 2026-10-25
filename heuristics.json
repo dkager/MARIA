@@ -1,0 +1,8 @@
+{
+  "description": "Settings of Heuristiek (js/heuristics.js): with Heuristiek on, a formula that converts without an error is still put before the user when it is longer, deeper, etc. than below. The limits were chosen from the formulas of a sample publication. ignoredCharacters are usual characters that are not unusual (besides mathcat/unchanged-characters.json); the no-break space is one of them, but its misuse is counted.",
+  "maxElements": 50,
+  "maxDepth": 7,
+  "maxLinearLength": 120,
+  "minTextWords": 4,
+  "ignoredCharacters": "⋅≈∨°∠≠×∆ "
+}

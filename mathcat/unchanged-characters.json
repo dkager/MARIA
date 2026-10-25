@@ -1,0 +1,4 @@
+{
+  "description": "Characters other than ASCII that the Dedicon braille rules of MathCAT write as they are (from unicode.yaml and unicode-full.yaml)",
+  "characters": "€£áàâäéèêëíìîïóòôöúùûüçÁÀÂÄÉÈÊËÍÌÎÏÓÒÔÖÚÙÛÜÇ"
+}

@@ -1,0 +1,111 @@
+<!doctype html>
+<!-- Part of MARIA (MathML Automatisch Renderen In ASCII) -->
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>💃 MARIA</title>
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/pico.min.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+  <script src="js/startup.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <hgroup>
+        <h1><span class="logo">💃</span> MARIA</h1>
+        <p>MathML Automatisch Renderen In ASCII</p>
+      </hgroup>
+      <label>
+        <input type="checkbox" role="switch" id="dark-mode">
+        Dark Mode
+      </label>
+    </header>
+
+    <div class="grid">
+      <article role="region" aria-labelledby="file-title">
+        <header id="file-title">Bestand</header>
+        <div class="toolbar">
+          <button type="button" id="browse">Bladeren…</button>
+          <input type="file" id="file" accept=".xml,.zip,application/xml,text/xml,application/zip" hidden>
+          <button type="button" id="convert" disabled>Converteer</button>
+          <button type="button" id="result" disabled>Resultaat</button>
+        </div>
+        <p class="file-status" role="status">
+          <span id="file-name">Geen bestand</span>
+          <span id="formula-count" hidden></span>
+        </p>
+        <div class="progress" id="progress" role="progressbar" aria-label="Conversie" aria-valuemin="0"
+             aria-valuemax="100" aria-valuenow="0" aria-valuetext="0%" aria-disabled="true">
+          <div class="progress-fill"></div>
+        </div>
+      </article>
+
+      <article role="region" aria-labelledby="settings-title">
+        <header id="settings-title">Instellingen</header>
+        <label>
+          <input type="checkbox" role="switch" id="heuristic-on">
+          Heuristiek
+        </label>
+        <label>
+          <input type="checkbox" id="replace-mfenced">
+          Repareer <code>&lt;mfenced&gt;</code>
+        </label>
+        <div class="choices">
+          <label>
+            <input type="checkbox" role="switch" id="context-on">
+            Context
+          </label>
+          <label>
+            <input type="checkbox" role="switch" id="preview-on">
+            Preview
+          </label>
+        </div>
+      </article>
+    </div>
+
+    <div class="message-bar" id="error" role="alert"></div>
+    <noscript><div class="message-bar" data-kind="error">MARIA heeft JavaScript nodig. Zet JavaScript aan en laad de pagina opnieuw.</div></noscript>
+
+    <div class="recovery">
+      <section class="rescue" aria-labelledby="rescue-title">
+        <div class="toolbar">
+          <h2 id="rescue-title">Herstel: geen fout</h2>
+          <div class="toolbar">
+            <button type="button" id="skip" disabled>Skip</button>
+            <button type="button" id="submit" disabled>OK</button>
+          </div>
+        </div>
+        <textarea id="rescue-mathml" aria-labelledby="rescue-title" spellcheck="false" autocomplete="off"
+                  autocapitalize="off" disabled>&lt;!-- Geen fout --&gt;</textarea>
+      </section>
+
+      <section class="context" id="context-panel" aria-labelledby="context-title">
+        <h2 id="context-title">Context</h2>
+        <div class="field context-text" id="context" role="textbox" aria-readonly="true" aria-multiline="true"
+             aria-labelledby="context-title" aria-disabled="true"></div>
+      </section>
+
+      <section class="preview" id="preview" aria-labelledby="preview-title">
+        <h2 id="preview-title">Preview</h2>
+        <div class="preview-fields">
+          <div class="field" id="preview-mathml" role="region" aria-label="MathML" aria-disabled="true"></div>
+          <div class="field preview-linear" id="preview-linear" role="region" aria-label="Lineair"
+               aria-disabled="true"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="container page-footer">
+    <small id="mathcat-version"></small>
+    <span class="footer-story"><span role="img" aria-label="MARIA">💃</span> <span role="img" aria-label="loves">💖</span> <span role="img" aria-label="math">🧮</span> <span role="img" aria-label="and">∧</span> <span role="img" aria-label="hates">🙄</span> <span role="img" aria-label="work">🛠️</span></span>
+    <small>© Davy Kager</small>
+  </footer>
+</body>
+</html>
