@@ -22,7 +22,7 @@
         <p>MathML Automatisch Renderen In ASCII</p>
       </hgroup>
       <label>
-        <input type="checkbox" role="switch" id="dark-mode">
+        <input type="checkbox" role="switch" id="dark-mode" aria-keyshortcuts="D">
         Dark Mode
       </label>
     </header>
@@ -31,17 +31,17 @@
       <article role="region" aria-labelledby="file-title">
         <header id="file-title">Bestand</header>
         <div class="toolbar">
-          <button type="button" id="browse">Bladeren…</button>
+          <button type="button" id="browse" aria-keyshortcuts="B">Bladeren…</button>
           <input type="file" id="file" accept=".xml,.zip,application/xml,text/xml,application/zip" hidden>
-          <button type="button" id="convert" disabled>Converteer</button>
-          <button type="button" id="result" disabled>Resultaat</button>
+          <button type="button" id="convert" aria-keyshortcuts="X" disabled>Converteer</button>
+          <button type="button" id="result" aria-keyshortcuts="R" disabled>Resultaat</button>
         </div>
         <p class="file-status" role="status">
           <span id="file-name">Geen bestand</span>
           <span id="formula-count" hidden></span>
         </p>
         <div class="progress" id="progress" role="progressbar" aria-label="Conversie" aria-valuemin="0"
-             aria-valuemax="100" aria-valuenow="0" aria-valuetext="0%" aria-disabled="true">
+             aria-valuemax="100" aria-valuenow="0" aria-valuetext="0%" data-inactive>
           <div class="progress-fill"></div>
         </div>
       </article>
@@ -49,7 +49,7 @@
       <article role="region" aria-labelledby="settings-title">
         <header id="settings-title">Instellingen</header>
         <label>
-          <input type="checkbox" role="switch" id="heuristic-on">
+          <input type="checkbox" role="switch" id="heuristic-on" aria-keyshortcuts="H">
           Heuristiek
         </label>
         <label>
@@ -58,27 +58,34 @@
         </label>
         <div class="choices">
           <label>
-            <input type="checkbox" role="switch" id="context-on">
+            <input type="checkbox" role="switch" id="context-on" aria-keyshortcuts="C">
             Context
           </label>
           <label>
-            <input type="checkbox" role="switch" id="preview-on">
+            <input type="checkbox" role="switch" id="preview-on" aria-keyshortcuts="P">
             Preview
           </label>
         </div>
       </article>
     </div>
 
-    <div class="message-bar" id="error" role="alert"></div>
-    <noscript><div class="message-bar" data-kind="error">MARIA heeft JavaScript nodig. Zet JavaScript aan en laad de pagina opnieuw.</div></noscript>
+    <div role="region" aria-label="Meldingen">
+      <div class="message-bar" id="message" aria-live="assertive" aria-atomic="true">
+        <span role="img" aria-label="Fout" data-icon="error" hidden>✖</span>
+        <span role="img" aria-label="Let op" data-icon="warning" hidden>⚠</span>
+        <span role="img" aria-label="Samenvatting" data-icon="summary" hidden>⚠</span>
+        <span id="message-text"></span>
+      </div>
+      <noscript><div class="message-bar" data-kind="error"><span role="img" aria-label="Fout" data-icon="error">✖</span>MARIA heeft JavaScript nodig. Zet JavaScript aan en laad de pagina opnieuw.</div></noscript>
+    </div>
 
     <div class="recovery">
       <section class="rescue" aria-labelledby="rescue-title">
         <div class="toolbar">
           <h2 id="rescue-title">Herstel: geen fout</h2>
           <div class="toolbar">
-            <button type="button" id="skip" disabled>Skip</button>
-            <button type="button" id="submit" disabled>OK</button>
+            <button type="button" id="skip" aria-keyshortcuts="S" disabled>Skip</button>
+            <button type="button" id="submit" aria-keyshortcuts="O" disabled>OK</button>
           </div>
         </div>
         <textarea id="rescue-mathml" aria-labelledby="rescue-title" spellcheck="false" autocomplete="off"
@@ -87,20 +94,28 @@
 
       <section class="context" id="context-panel" aria-labelledby="context-title">
         <h2 id="context-title">Context</h2>
-        <div class="field context-text" id="context" role="textbox" aria-readonly="true" aria-multiline="true"
-             aria-labelledby="context-title" aria-disabled="true"></div>
+        <div class="field context-text" id="context" data-inactive></div>
       </section>
 
       <section class="preview" id="preview" aria-labelledby="preview-title">
         <h2 id="preview-title">Preview</h2>
         <div class="preview-fields">
-          <div class="field" id="preview-mathml" role="region" aria-label="MathML" aria-disabled="true"></div>
-          <div class="field preview-linear" id="preview-linear" role="region" aria-label="Lineair"
-               aria-disabled="true"></div>
+          <div class="field" id="preview-mathml" role="region" aria-label="MathML"></div>
+          <div class="field preview-linear" id="preview-linear" role="region" aria-label="Lineair"></div>
         </div>
       </section>
     </div>
   </main>
+
+  <dialog id="confirm" aria-labelledby="confirm-text">
+    <article>
+      <p id="confirm-text">Hierdoor gaan alle bewerkingen in deze publicatie verloren. Doorgaan?</p>
+      <footer>
+        <button type="button" id="confirm-yes" class="secondary">Ja</button>
+        <button type="button" id="confirm-no" autofocus>Nee</button>
+      </footer>
+    </article>
+  </dialog>
 
   <footer class="container page-footer">
     <small id="mathcat-version"></small>

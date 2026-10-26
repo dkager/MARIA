@@ -1,4 +1,5 @@
 // Part of MARIA (MathML Automatisch Renderen In ASCII)
+import { confirmLoss, recheckConfirm } from './confirm.js';
 import { showContextPanel } from './context-panel.js';
 import { convertPublication } from './conversion.js';
 import { FormulaError, ZipError } from './errors.js';
@@ -24,14 +25,20 @@ const progress = new ProgressBar(document.getElementById('progress'));
 
 let publication = null;
 let output = null;
+let downloaded = false;
 let conversion = null;
 let opening = null;
+
+function losesWork() {
+  return conversion !== null || (output !== null && !downloaded);
+}
 
 function showRunning(running) {
   convert.textContent = running ? 'Stop' : 'Converteer';
   convert.disabled = !running && (publication === null || publication.formulas.length === 0);
   replaceMfenced.disabled = running;
   heuristicOn.disabled = running;
+  recheckConfirm();
 }
 
 function stopConversion() {
@@ -48,6 +55,7 @@ function stopConversion() {
 
 function setResult(zip) {
   output = zip;
+  downloaded = false;
   result.disabled = zip === null;
 }
 
@@ -60,12 +68,15 @@ function dropResult() {
 }
 
 async function chooseFile(file) {
+  if (losesWork() && !(await confirmLoss(losesWork))) {
+    return;
+  }
   const current = (opening = {});
   stopConversion();
   setResult(null);
   publication = null;
   convert.disabled = true;
-  progress.setEnabled(true);
+  progress.activate();
   progress.reset();
   showMessage(null);
   showStatus(file.name, 'Bezig met tellen…');
@@ -104,10 +115,10 @@ function stopByUser() {
 async function startConversion() {
   setResult(null);
   showMessage(null);
-  progress.reset();
   const chosen = publication;
   const controller = new AbortController();
   const current = (conversion = { controller, done: 0, total: chosen.formulas.length });
+  progress.set(0, current.total);
   const settings = { withEmptySeparators: replaceMfenced.checked, limits: null };
   showRunning(true);
   if (heuristicOn.checked) {
@@ -130,7 +141,7 @@ async function startConversion() {
       signal: controller.signal,
       onProgress: (done) => {
         current.done = done;
-        progress.set(done / current.total);
+        progress.set(done, current.total);
       },
       onPause: startPause,
     });
@@ -138,11 +149,11 @@ async function startConversion() {
     if (controller.signal.aborted) {
       return;
     }
-    progress.set(1);
+    progress.set(current.total, current.total);
     setResult(zip);
     const summary = summaryText(converted);
     if (summary) {
-      showMessage(summary, 'warning');
+      showMessage(summary, 'summary');
     }
   } catch (e) {
     if (e.name === 'AbortError') {
@@ -163,6 +174,7 @@ function download() {
   link.href = url;
   link.download = zipName(publication.file.name);
   link.click();
+  downloaded = true;
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
@@ -170,7 +182,7 @@ rememberSwitch(replaceMfenced, 'maria-replace-mfenced', false, dropResult);
 rememberSwitch(contextOn, 'maria-context', true, showContextPanel);
 rememberSwitch(previewOn, 'maria-preview', true, (on) => {
   showPreviewPanel(on);
-  refreshPreview(true);
+  refreshPreview();
 });
 rememberSwitch(heuristicOn, 'maria-heuristic', false);
 
@@ -178,11 +190,31 @@ setUpShortcuts();
 setUpFilePicker(chooseFile);
 showVersion();
 
-convert.addEventListener('click', () => {
+convert.addEventListener('click', async () => {
   if (conversion) {
-    stopByUser();
+    if ((await confirmLoss(() => conversion !== null)) && conversion) {
+      stopByUser();
+    }
   } else if (publication && publication.formulas.length > 0) {
     startConversion();
+  }
+});
+
+replaceMfenced.addEventListener('click', (event) => {
+  if (losesWork()) {
+    event.preventDefault();
+    confirmLoss(losesWork).then((yes) => {
+      if (yes) {
+        replaceMfenced.checked = !replaceMfenced.checked;
+        replaceMfenced.dispatchEvent(new Event('change'));
+      }
+    });
+  }
+});
+
+window.addEventListener('beforeunload', (event) => {
+  if (losesWork()) {
+    event.preventDefault();
   }
 });
 

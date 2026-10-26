@@ -3,20 +3,19 @@ export function formulasText(n) {
   return n === 1 ? '1 formule' : `${n} formules`;
 }
 
-function problemText(problems, [one, more]) {
-  const verb = problems.length === 1 ? one : more;
-  return `${formulasText(problems.length)} ${verb} (de eerste is formule ${problems[0].number}, regel ${problems[0].line})`;
+function problemText(count, [one, more]) {
+  return `${formulasText(count)} ${count === 1 ? one : more}`;
 }
 
 export function summaryText(converted) {
   const warnings = [];
-  if (converted.skipped.length) {
+  if (converted.skipped) {
     warnings.push(problemText(converted.skipped, ['is overgeslagen (To do-commentaar)', 'zijn overgeslagen (To do-commentaar)']));
   }
-  if (converted.unknown.length) {
+  if (converted.unknown) {
     warnings.push(problemText(converted.unknown, ['bevat een teken dat MathCAT niet kent', 'bevatten een teken dat MathCAT niet kent']));
   }
-  if (converted.empty.length) {
+  if (converted.empty) {
     warnings.push(problemText(converted.empty, ['is leeg', 'zijn leeg']));
   }
   if (converted.mfencedChanged) {

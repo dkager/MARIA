@@ -128,21 +128,13 @@ body > main {
   --message-color: var(--pico-del-color);
 }
 
-.message-bar[data-kind="warning"] {
+.message-bar[data-kind="warning"],
+.message-bar[data-kind="summary"] {
   --message-color: var(--pico-color);
 }
 
-.message-bar[data-kind="error"]::before,
-.message-bar[data-kind="warning"]::before {
+.message-bar [data-icon] {
   color: var(--message-color);
-}
-
-.message-bar[data-kind="error"]::before {
-  content: "✖" / "Fout: ";
-}
-
-.message-bar[data-kind="warning"]::before {
-  content: "⚠" / "Let op: ";
 }
 
 .progress {
@@ -153,7 +145,10 @@ body > main {
   border: 1px solid var(--pico-muted-border-color);
   border-radius: var(--pico-border-radius);
   background-color: var(--pico-muted-border-color);
-  overflow: hidden;
+}
+
+.progress[data-tooltip] {
+  border-bottom: 1px solid var(--pico-muted-border-color);
 }
 
 [data-theme="dark"] .progress {
@@ -163,19 +158,20 @@ body > main {
 
 .progress-fill {
   height: 100%;
+  border-radius: inherit;
   background-image: linear-gradient(to right, var(--progress-from), var(--progress-to));
   clip-path: inset(0 calc(100% - var(--progress-value)) 0 0);
   transition: clip-path 250ms linear;
 }
 
-.progress[aria-disabled="true"] {
+.progress[data-inactive] {
   border-style: dashed;
   border-color: var(--pico-muted-color);
   background-color: transparent;
   opacity: 0.5;
 }
 
-.progress[aria-disabled="true"] .progress-fill {
+.progress[data-inactive] .progress-fill {
   visibility: hidden;
 }
 
@@ -260,7 +256,7 @@ body > main {
   display: inline-block;
 }
 
-.field[aria-disabled="true"] {
+.field[data-inactive] {
   opacity: var(--pico-form-element-disabled-opacity);
 }
 

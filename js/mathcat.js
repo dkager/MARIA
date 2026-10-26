@@ -5,6 +5,8 @@ const TIMEOUT_SECONDS = 15;
 
 export class MathCATUnavailable extends Error {}
 
+export class MathCATStopped extends Error {}
+
 let worker = null;
 let nextId = 1;
 const waiting = new Map();
@@ -28,7 +30,7 @@ function getWorker() {
         if (ok) {
           job.resolve(text);
         } else {
-          job.reject(crashed ? new Error('MathCAT is vastgelopen op deze formule')
+          job.reject(crashed ? new MathCATStopped('MathCAT is vastgelopen op deze formule')
             : new (unavailable ? MathCATUnavailable : Error)(message));
         }
       }
@@ -54,7 +56,7 @@ function send(id, job) {
   clearTimeout(job.timer);
   job.timer = setTimeout(() => {
     waiting.delete(id);
-    job.reject(new Error(job.timeoutMessage));
+    job.reject(new MathCATStopped(job.timeoutMessage));
     restartMathCAT();
   }, TIMEOUT_SECONDS * 1000);
   getWorker().postMessage({ id, ...job.message });

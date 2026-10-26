@@ -4,7 +4,9 @@ import { MARIA_VERSION } from './version.js';
 
 const fileName = document.getElementById('file-name');
 const formulaCount = document.getElementById('formula-count');
-const message = document.getElementById('error');
+const message = document.getElementById('message');
+const messageText = document.getElementById('message-text');
+const icons = message.querySelectorAll('[data-icon]');
 const versionText = document.getElementById('mathcat-version');
 
 export function readable(text) {
@@ -19,12 +21,15 @@ export function showStatus(name, count) {
 }
 
 export function showMessage(text, kind = 'error') {
-  message.textContent = text ? readable(text) : '';
+  messageText.textContent = text ? readable(text) : '';
   message.dataset.kind = text ? kind : '';
+  for (const icon of icons) {
+    icon.hidden = !text || icon.dataset.icon !== kind;
+  }
 }
 
 export function shownMessage() {
-  return message.textContent;
+  return messageText.textContent;
 }
 
 export function showVersion() {

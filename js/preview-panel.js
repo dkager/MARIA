@@ -2,15 +2,12 @@
 import { mathmlPreview } from './preview.js';
 import { readable, shownMessage } from './status.js';
 
-const DELAY = 1000;
-
 const panel = document.getElementById('preview');
 const mathmlField = document.getElementById('preview-mathml');
 const linearField = document.getElementById('preview-linear');
 
-let shownText = null;
-let run = 0;
-let timer = 0;
+let shown = null;
+let shownState = null;
 
 function message(text, reason = null) {
   const element = document.createElement('p');
@@ -22,44 +19,11 @@ function message(text, reason = null) {
   return element;
 }
 
-function enable(field, on) {
-  field.setAttribute('aria-disabled', String(!on));
-  field.tabIndex = on ? 0 : -1;
-}
-
-function clearPreview() {
-  shownText = null;
-  run++;
-  mathmlField.replaceChildren();
-  linearField.replaceChildren();
-  enable(mathmlField, false);
-  enable(linearField, false);
-}
-
-function showMathml(text, declarations) {
+function showMathml(checked) {
   try {
-    mathmlField.replaceChildren(mathmlPreview(text, declarations));
+    mathmlField.replaceChildren(mathmlPreview(checked.text, checked.pause.declarations));
   } catch (e) {
     mathmlField.replaceChildren(message('Kan niet worden getoond', e.message));
-  }
-}
-
-function showLinear(pause, text) {
-  const thisRun = run;
-  const show = (dedicon, reason) => {
-    if (thisRun === run) {
-      linearField.replaceChildren(dedicon === null ? message('Niet beschikbaar', reason)
-        : dedicon.trim() === '' ? message('(leeg)') : dedicon);
-    }
-  };
-  if (text === pause.mathml.replace(/\r\n?/g, '\n')) {
-    show(pause.dedicon, pause.message);
-  } else {
-    linearField.replaceChildren(message('Bezig…'));
-    pause.toLinear(text).then(
-      (done) => show(done.dedicon),
-      (e) => show(null, e.name === 'AbortError' ? null : e.message),
-    );
   }
 }
 
@@ -67,24 +31,26 @@ export function showPreviewPanel(visible) {
   panel.hidden = !visible;
 }
 
-export function updatePreviewLater(update) {
-  clearTimeout(timer);
-  timer = setTimeout(update, DELAY);
-}
-
-export function updatePreview(pause, text, force = false) {
-  clearTimeout(timer);
-  if (!pause || panel.hidden) {
-    clearPreview();
+export function showPreview(checked, force = false) {
+  if (!checked || panel.hidden) {
+    shown = null;
+    mathmlField.replaceChildren();
+    linearField.replaceChildren();
     return;
   }
-  if (text === shownText && !force) {
+  if (!force && checked === shown && checked.state === shownState) {
     return;
   }
-  shownText = text;
-  run++;
-  enable(mathmlField, true);
-  enable(linearField, true);
-  showMathml(text, pause.declarations);
-  showLinear(pause, text);
+  shown = checked;
+  shownState = checked.state;
+  if (checked.state === 'pending') {
+    mathmlField.replaceChildren(message('Bezig…'));
+    linearField.replaceChildren(message('Bezig…'));
+  } else if (checked.state === 'ok') {
+    showMathml(checked);
+    linearField.replaceChildren(checked.dedicon.trim() === '' ? message('(leeg)') : checked.dedicon);
+  } else {
+    mathmlField.replaceChildren(message('Niet beschikbaar'));
+    linearField.replaceChildren(message('Niet beschikbaar', checked.reason));
+  }
 }

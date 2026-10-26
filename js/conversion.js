@@ -1,7 +1,7 @@
 // Part of MARIA (MathML Automatisch Renderen In ASCII)
 import { FormulaError, abortError } from './errors.js';
 import { heuristicFindings, misusesNoBreakSpace } from './heuristics.js';
-import { MathCATUnavailable, toDedicon } from './mathcat.js';
+import { MathCATStopped, MathCATUnavailable, toDedicon } from './mathcat.js';
 import { codePiece, markupPiece, todoPiece } from './pieces.js';
 import { formulaContext, lineFinder, replaceFormulas } from './scanner.js';
 import { parseFormula } from './xml.js';
@@ -39,10 +39,6 @@ class Pause {
 
   get busy() {
     return this.#busy;
-  }
-
-  get open() {
-    return this.#open;
   }
 
   toLinear(mathml) {
@@ -96,7 +92,7 @@ class Pause {
       if (!(e instanceof FormulaError)) {
         throw e;
       }
-      Object.assign(this, { message: e.message, kind: 'error', mathml, dedicon: null });
+      Object.assign(this, { message: e.message, kind: 'error', mathml, dedicon: null, certain: e.certain });
       return e.message;
     } finally {
       this.#busy = false;
@@ -112,7 +108,7 @@ class Pause {
 export async function convertPublication(publication, settings, { signal, onProgress, onPause }) {
   const { bytes, formulas, pages, encoding, newline, declarations } = publication;
   const { withEmptySeparators, limits } = settings;
-  const counts = { skipped: [], unknown: [], empty: [], mfencedChanged: 0, flagged: 0, noBreakSpaces: 0 };
+  const counts = { skipped: 0, unknown: 0, empty: 0, mfencedChanged: 0, flagged: 0, noBreakSpaces: 0 };
 
   const converter = {
     async toLinear(mathml) {
@@ -127,7 +123,7 @@ export async function convertPublication(publication, settings, { signal, onProg
         if (e.name === 'AbortError' || e instanceof MathCATUnavailable) {
           throw e;
         }
-        throw new FormulaError(e.message, { cause: e });
+        throw Object.assign(new FormulaError(e.message, { cause: e }), { certain: !(e instanceof MathCATStopped) });
       }
     },
 
@@ -140,12 +136,12 @@ export async function convertPublication(publication, settings, { signal, onProg
     },
 
     accept(converted) {
-      const { dedicon, number, line } = converted;
+      const { dedicon } = converted;
       counts.mfencedChanged += converted.changed;
       if (dedicon.trim() === '') {
-        counts.empty.push({ number, line });
+        counts.empty++;
       } else if (hasUnknownCharacter(dedicon)) {
-        counts.unknown.push({ number, line });
+        counts.unknown++;
       }
       if (misusesNoBreakSpace(converted.math)) {
         counts.noBreakSpaces++;
@@ -154,13 +150,13 @@ export async function convertPublication(publication, settings, { signal, onProg
     },
 
     skip(pause) {
-      counts.skipped.push({ number: pause.number, line: pause.line });
+      counts.skipped++;
       const todo = todoPiece(pause.original.message, pause.original.mathml, encoding, newline);
       return { linear: todo, corrected: todo };
     },
   };
 
-  function pause(message, kind, k, line, mathml, converted = null) {
+  function pause(message, kind, k, line, mathml, converted = null, certain = true) {
     return new Promise((resolve, reject) => {
       if (signal.aborted) {
         reject(abortError());
@@ -171,7 +167,8 @@ export async function convertPublication(publication, settings, { signal, onProg
         reject(abortError());
       };
       const p = new Pause({
-        number: k + 1, line, page: pages[k], message, kind, mathml, converted, declarations,
+        number: k + 1, line, page: pages[k], message, kind, converted, declarations, certain,
+        mathml: withEmptySeparators ? addEmptySeparators(mathml).text : mathml,
         dedicon: converted?.dedicon ?? null, original: { message, mathml },
         context: formulaContext(bytes, formulas[k], encoding),
       }, (piece) => {
@@ -195,7 +192,7 @@ export async function convertPublication(publication, settings, { signal, onProg
       if (!(e instanceof FormulaError)) {
         throw e;
       }
-      return pause(e.message, 'error', k, line, mathml);
+      return pause(e.message, 'error', k, line, mathml, null, e.certain);
     }
     const findings = limits ? heuristicFindings(one.math, one.dedicon, limits) : [];
     if (findings.length === 0) {

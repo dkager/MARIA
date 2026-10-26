@@ -2,6 +2,7 @@
 import { FormulaError } from './errors.js';
 
 const NAMED_ENTITY = /&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)[A-Za-z][\w.-]*;/g;
+const TEXT_ELEMENTS = new Set(['mi', 'mn', 'mo', 'mtext', 'ms', 'annotation']);
 const PARSER_ERROR_NAMESPACES = ['http://www.w3.org/1999/xhtml', 'http://www.mozilla.org/newlayout/xml/parsererror.xml'];
 
 function parserError(doc) {
@@ -11,7 +12,25 @@ function parserError(doc) {
 function parserMessage(error) {
   const message = /at column \d+: ([^\n]*)/.exec(error.textContent)?.[1]
     ?? error.textContent.split('\n').find((l) => l.trim())?.trim() ?? '';
-  return message.replace(/Below is a rendering.*$/, '').replaceAll('maria-check', 'einde van de formule').trim();
+  return message.replace(/Below is a rendering.*$/, '').replace(/\{[^}]*\}/g, '')
+    .replaceAll('maria-check', 'einde van de formule').trim();
+}
+
+function strayText(element) {
+  for (const node of element.childNodes) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const found = node.localName === 'annotation-xml' ? null : strayText(node);
+      if (found) {
+        return found;
+      }
+    } else if ((node.nodeType === Node.TEXT_NODE || node.nodeType === Node.CDATA_SECTION_NODE)
+      && !TEXT_ELEMENTS.has(element.localName) && /[^ \t\r\n]/.test(node.data)) {
+      const text = node.data.replace(/^[ \t\r\n]+|[ \t\r\n]+$/g, '')
+        .replace(/[^\S \t\r\n]/g, (c) => `[U+${c.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}]`);
+      return `tekst "${text.length > 40 ? `${text.slice(0, 40)}…` : text}" staat direct in <${element.nodeName}>`;
+    }
+  }
+  return null;
 }
 
 function nextOutside(walker) {
@@ -71,6 +90,10 @@ export function parseFormula(formula, declarations, entity = () => ' ') {
     && n.nodeType !== Node.COMMENT_NODE && n.textContent.trim() !== '');
   if (root.children.length !== 1 || root.firstElementChild.localName !== 'math' || hasText) {
     throw new FormulaError('de formule moet precies één <math>-element zijn');
+  }
+  const stray = strayText(root.firstElementChild);
+  if (stray) {
+    throw new FormulaError(stray);
   }
   return root.firstElementChild;
 }

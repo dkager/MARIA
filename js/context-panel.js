@@ -24,7 +24,6 @@ export function showContext(around, kind) {
   } else {
     field.replaceChildren();
   }
-  field.setAttribute('aria-disabled', String(!around));
-  field.tabIndex = around ? 0 : -1;
+  field.toggleAttribute('data-inactive', !around);
   center();
 }

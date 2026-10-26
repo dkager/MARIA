@@ -13,14 +13,17 @@ const MATH = ascii('math');
 const ELLIPSIS = '\u2026';
 const LEADING_REPLACEMENTS = /^\uFFFD+/, TRAILING_REPLACEMENTS = /\uFFFD+$/;
 
-export function formulaContext(bytes, { start, end }, encoding, maxLines = 100, maxBytes = 20_000) {
+const CONTEXT_LINES = 100;
+const CONTEXT_BYTES = 20_000;
+
+export function formulaContext(bytes, { start, end }, encoding) {
   let from = start, lines = 0;
-  while (from > 0 && start - from < maxBytes && !(bytes[from - 1] === NEWLINE && ++lines > maxLines)) {
+  while (from > 0 && start - from < CONTEXT_BYTES && !(bytes[from - 1] === NEWLINE && ++lines > CONTEXT_LINES)) {
     from--;
   }
   let to = end;
   lines = 0;
-  while (to < bytes.length && to - end < maxBytes && !(bytes[to] === NEWLINE && ++lines > maxLines)) {
+  while (to < bytes.length && to - end < CONTEXT_BYTES && !(bytes[to] === NEWLINE && ++lines > CONTEXT_LINES)) {
     to++;
   }
   const decoder = new TextDecoder(encoding);

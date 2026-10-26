@@ -9,16 +9,16 @@ export class ProgressBar {
     this.timer = null;
   }
 
-  setEnabled(enabled) {
-    this.element.setAttribute('aria-disabled', String(!enabled));
+  activate() {
+    this.element.removeAttribute('data-inactive');
   }
 
   reset() {
-    this.set(0);
+    this.set(0, 0);
   }
 
-  set(fraction) {
-    this.pending = Math.min(1, Math.max(0, fraction));
+  set(done, total) {
+    this.pending = { done, total };
     const wait = this.lastDraw + INTERVAL - performance.now();
     if (wait <= 0) {
       this.draw();
@@ -31,12 +31,18 @@ export class ProgressBar {
     clearTimeout(this.timer);
     this.timer = null;
     if (this.pending !== null) {
-      const percent = Math.round(this.pending * 100);
+      const { done, total } = this.pending;
+      const percent = total ? Math.round(Math.min(1, done / total) * 100) : 0;
       this.pending = null;
       this.lastDraw = performance.now();
       this.element.style.setProperty('--progress-value', `${percent}%`);
       this.element.setAttribute('aria-valuenow', String(percent));
       this.element.setAttribute('aria-valuetext', `${percent}%`);
+      if (total) {
+        this.element.dataset.tooltip = `${done}/${total} ${total === 1 ? 'formule' : 'formules'}`;
+      } else {
+        delete this.element.dataset.tooltip;
+      }
     }
   }
 }

@@ -192,7 +192,8 @@ function fileFields(e) {
     [4, e.size], [2, e.nameBytes.length], [2, 0]];
 }
 
-export async function zipFiles(files, date = new Date()) {
+export async function zipFiles(files) {
+  const date = new Date();
   const entries = await Promise.all(files.map((f) => (f.compressed ? f : newEntry(f, date))));
   const parts = [], central = [];
   let offset = 0;
