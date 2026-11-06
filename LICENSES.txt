@@ -1200,7 +1200,7 @@ SOFTWARE.
 --------------------------------------------------------------------------------
 MIT License
 Used by:
-  - mathcat 0.7.8-alpha (https://github.com/daisy/MathCAT)
+  - mathcat 0.7.8-alpha.1 (https://github.com/daisy/MathCAT)
 
 MIT License
 
