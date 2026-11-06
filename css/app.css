@@ -276,7 +276,7 @@ body > main {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--pico-color);
+  color: var(--pico-primary);
   font-size: 1.25rem;
   line-height: 1;
 }
