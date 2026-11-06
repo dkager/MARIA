@@ -21,7 +21,7 @@ function message(text, reason = null) {
 
 function showMathml(checked) {
   try {
-    mathmlField.replaceChildren(mathmlPreview(checked.text, checked.pause.declarations));
+    mathmlField.replaceChildren(mathmlPreview(checked.mathml, checked.pause.declarations));
   } catch (e) {
     mathmlField.replaceChildren(message('Kan niet worden getoond', e.message));
   }

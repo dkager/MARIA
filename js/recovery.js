@@ -19,8 +19,8 @@ function updateOk() {
     || (checked?.pause === paused && checked.text === rescueField.value && checked.state === 'error');
 }
 
-function settle(result, state, dedicon = null, reason = null) {
-  Object.assign(result, { state, dedicon, reason });
+function settle(result, state, dedicon = null, reason = null, mathml = result.text) {
+  Object.assign(result, { state, dedicon, reason, mathml });
   if (checked === result) {
     updateOk();
     showPreview(checked);
@@ -50,7 +50,7 @@ function checkText(force = false) {
     return;
   }
   pause.toLinear(text).then(
-    (done) => settle(result, 'ok', done.dedicon),
+    (done) => settle(result, 'ok', done.dedicon, null, done.mathml),
     (e) => {
       if (e.name !== 'AbortError') {
         settle(result, e.certain ? 'error' : 'unknown', null, e.message);
