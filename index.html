@@ -98,7 +98,10 @@
       </section>
 
       <section class="preview" id="preview" aria-labelledby="preview-title">
-        <h2 id="preview-title">Preview</h2>
+        <div class="toolbar">
+          <h2 id="preview-title">Preview</h2>
+          <button type="button" id="preview-info" aria-label="i">ⓘ</button>
+        </div>
         <div class="preview-fields">
           <div class="field" id="preview-mathml" role="region" aria-label="MathML"></div>
           <div class="field preview-linear" id="preview-linear" role="region" aria-label="Lineair"></div>
@@ -113,6 +116,18 @@
       <footer>
         <button type="button" id="confirm-yes" class="secondary">Ja</button>
         <button type="button" id="confirm-no" autofocus>Nee</button>
+      </footer>
+    </article>
+  </dialog>
+
+  <dialog id="preview-note" aria-labelledby="preview-note-text">
+    <article>
+      <div id="preview-note-text">
+        <p>De webbrowser genereert de visuele preview. Er kunnen daarom afwijkingen zijn van wat de MathML-code beschrijft. <code>&lt;mfenced&gt;</code> werkt bijvoorbeeld niet goed in alle browsers.</p>
+        <p>De lineaire notatie is letterlijk wat MathCAT oplevert.</p>
+      </div>
+      <footer>
+        <button type="button" id="preview-note-close" autofocus>OK</button>
       </footer>
     </article>
   </dialog>

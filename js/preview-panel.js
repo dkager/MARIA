@@ -5,9 +5,13 @@ import { readable, shownMessage } from './status.js';
 const panel = document.getElementById('preview');
 const mathmlField = document.getElementById('preview-mathml');
 const linearField = document.getElementById('preview-linear');
+const note = document.getElementById('preview-note');
 
 let shown = null;
 let shownState = null;
+
+document.getElementById('preview-info').addEventListener('click', () => note.showModal());
+document.getElementById('preview-note-close').addEventListener('click', () => note.close());
 
 function message(text, reason = null) {
   const element = document.createElement('p');

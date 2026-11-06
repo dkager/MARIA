@@ -266,6 +266,21 @@ body > main {
   box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-form-element-focus-color);
 }
 
+.preview .toolbar {
+  column-gap: calc(var(--pico-spacing) / 2);
+}
+
+#preview-info {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pico-color);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 .preview-fields {
   display: grid;
   grid-template-rows: 1fr 1fr;
