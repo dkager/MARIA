@@ -6,7 +6,7 @@ function escapeText(text) {
 }
 
 export function codePiece(dedicon, encoding) {
-  return encodeForFile(`<code class="maria-math">${escapeText(dedicon)}</code>`, encoding);
+  return encodeForFile(`<span class="maria-math">${escapeText(dedicon)}</span>`, encoding);
 }
 
 export function markupPiece(markup, encoding, newline) {
