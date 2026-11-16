@@ -1344,7 +1344,7 @@ SOFTWARE.
 --------------------------------------------------------------------------------
 MIT License
 Used by:
-  - mathcat 0.7.8-alpha.1 (https://github.com/daisy/MathCAT)
+  - mathcat 0.7.9-alpha.1 (https://github.com/daisy/MathCAT)
 
 MIT License
 
@@ -1617,7 +1617,7 @@ SOFTWARE.
 --------------------------------------------------------------------------------
 MIT License
 Used by:
-  - zip 9.5.1 (https://github.com/zip-rs/zip2)
+  - zip 9.6.1 (https://github.com/zip-rs/zip2)
 
 The MIT License (MIT)
 
