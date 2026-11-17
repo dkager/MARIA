@@ -89,17 +89,13 @@ function textInFormula({ elements }, limits) {
   return words >= limits.minTextWords ? `tekst in de formule (${words} woorden in <mtext>)` : null;
 }
 
-function table({ elements }) {
-  return elements.some((e) => e.localName === 'mtable') ? 'tabel (<mtable>)' : null;
-}
-
 function emptyElement({ elements }) {
   const empty = elements.find((e) => (TOKENS.has(e.localName) || e.localName === 'mrow')
     && e.children.length === 0 && e.textContent.trim() === '');
   return empty ? `leeg element (<${empty.localName}>)` : null;
 }
 
-const CHECKS = [longFormula, deepFormula, unusualCharacters, doubleBrackets, longLinear, textInFormula, table, emptyElement];
+const CHECKS = [longFormula, deepFormula, unusualCharacters, doubleBrackets, longLinear, textInFormula, emptyElement];
 
 export function heuristicFindings(math, linear, limits) {
   const formula = { math, linear, elements: [...math.getElementsByTagName('*')] };
